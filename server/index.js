@@ -6,12 +6,14 @@ import UserRouter from "./routes/UserRoute.js";
 import RoomRouter from "./routes/RoomRoute.js";
 import HotelRouter from "./routes/HotelRoute.js";
 import AuthRouter from "./routes/AuthRoute.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 dotenv.config();
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 
 MongoConnection();
 

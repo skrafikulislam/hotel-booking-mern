@@ -1,6 +1,7 @@
 import UserModel from "../models/UserModel.js";
 import bcrypt from "bcryptjs";
 import { createError } from "../utils/Error.js";
+import jwt from "jsonwebtoken";
 
 // ! Register User
 export const Register = async (req, res, next) => {
@@ -23,18 +24,30 @@ export const Register = async (req, res, next) => {
 
 // ! Login User
 export const Login = async (req, res, next) => {
-  const { email, password } = req.body;
+  //   const { email, password } = req.body;
   try {
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({ email: req.body.email });
     if (!user) {
       return next(createError(404, "User Not Found"));
     }
-    const isPasswordCorrect = await bcrypt.compareSync(password, user.password);
+    const isPasswordCorrect = await bcrypt.compareSync(
+      req.body.password,
+      user.password
+    );
 
-    if (!isPasswordCorrect) {
+    if (!isPasswordCorrect)
       return next(createError(400, "Wrong Password, Write Valid Password"));
-    }
-    res.status(200).json(user);
+
+    const accessToken = jwt.sign(
+      { id: user._id, isAdmin: user.isAdmin },
+      process.env.SECRET_KEY
+    );
+
+    const { password, isAdmin, ...otherDetails } = user._doc;
+    res
+      .cookie("accessToken", accessToken, { httpOnly: true })
+      .status(200)
+      .json({ ...otherDetails });
   } catch (error) {
     next(error);
   }

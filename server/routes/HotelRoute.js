@@ -7,16 +7,18 @@ import {
   getAllHotel,
 } from "../controllers/HotelController.js";
 
+import { verifyAdmin, verifyToken, verifyUser } from "../utils/verifyToken.js";
+
 const router = express.Router();
 
 // ! Create Hotel In Data Base
-router.post("/", createHotel);
+router.post("/", verifyAdmin, createHotel);
 
 // ! Update Hotel By Id
-router.put("/:id", updateHotel);
+router.put("/:id",verifyAdmin, updateHotel);
 
 // ! Delete Hotel By Id
-router.delete("/:id", deleteHotel);
+router.delete("/:id",verifyAdmin, deleteHotel);
 
 // ! Get Specific Hotel
 router.get("/:id", getHotel);
